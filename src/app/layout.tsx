@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { lora } from "@/lib/fonts";
+import { lora, caveat, pangolin } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +16,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${lora.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${lora.variable} ${caveat.variable} ${pangolin.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

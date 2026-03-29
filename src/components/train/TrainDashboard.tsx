@@ -31,6 +31,7 @@ export default function TrainDashboard() {
     fetchRules();
   }, [fetchFeedback, fetchRules]);
 
+
   function toggleSelect(id: string) {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -56,18 +57,18 @@ export default function TrainDashboard() {
     <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="shrink-0 px-6 py-4 border-b border-celadon/30 flex items-center gap-4">
-        <h1 className="text-lg font-serif font-bold text-black">Train</h1>
-        <p className="text-xs font-sans text-black/40">
+        <h1 className="text-2xl font-serif font-bold text-black">Train</h1>
+        <p className="text-sm font-sans text-black/70">
           Review feedback, generate rules, improve responses <em>for all</em>
         </p>
         <div className="ml-auto flex items-center gap-2">
-          <label className="text-[11px] font-sans text-black/40 uppercase tracking-wider">
+          <label className="text-xs font-sans text-black/60 uppercase tracking-wider">
             Language
           </label>
           <select
             value={languageFilter}
             onChange={(e) => setLanguageFilter(e.target.value)}
-            className="text-xs font-sans px-2 py-1.5 rounded-lg border border-black/10 bg-white focus:outline-none focus:ring-1 focus:ring-celadon"
+            className="text-sm font-sans px-2 py-1.5 rounded-lg border border-black/10 bg-white focus:outline-none focus:ring-1 focus:ring-celadon"
           >
             <option value="">All</option>
             {languages.map((lang) => (

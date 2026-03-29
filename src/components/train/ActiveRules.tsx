@@ -31,17 +31,17 @@ export default function ActiveRules({
   return (
     <div className="flex flex-col min-h-0 overflow-hidden">
       <div className="shrink-0 px-4 py-3 border-b border-black/5">
-        <h2 className="text-[11px] font-sans font-medium text-black/50 uppercase tracking-wider">
+        <h2 className="text-sm font-sans font-semibold text-black/80 uppercase tracking-wider">
           Active Rules ({rules.length})
         </h2>
-        <p className="text-[10px] font-sans text-black/30 mt-0.5">
+        <p className="text-xs font-sans text-black/50 mt-0.5">
           Injected into future responses as system context
         </p>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {rules.length === 0 && (
-          <p className="text-sm font-sans text-black/30 text-center py-12 px-4">
+          <p className="text-base font-sans text-black/50 text-center py-12 px-4">
             No rules yet. Create rules from feedback to improve future
             responses.
           </p>
@@ -50,10 +50,10 @@ export default function ActiveRules({
         {Object.entries(grouped).map(([lang, langRules]) => (
           <div key={lang}>
             <div className="sticky top-0 bg-parchment px-4 py-2 border-b border-black/5">
-              <span className="text-[11px] font-sans font-medium text-black/50 tracking-wider">
+              <span className="text-sm font-sans font-semibold text-black/70 tracking-wider">
                 {nativeName(lang)}
               </span>
-              <span className="text-[10px] font-sans text-black/30 ml-2">
+              <span className="text-xs font-sans text-black/50 ml-2">
                 {langRules.length} rule{langRules.length > 1 ? "s" : ""}
               </span>
             </div>
@@ -65,28 +65,28 @@ export default function ActiveRules({
               >
                 <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-sans text-black/80">
+                    <p className="text-sm font-sans text-black/80">
                       {rule.rule}
                     </p>
 
                     {rule.examples?.map((ex, i) => (
                       <div
                         key={i}
-                        className="mt-1.5 text-[11px] font-sans p-1.5 rounded bg-black/[0.02]"
+                        className="mt-1.5 text-xs font-sans p-1.5 rounded bg-black/[0.02]"
                       >
-                        <p className="text-red-500/60 line-through">
+                        <p className="text-red-500/70 line-through">
                           {ex.bad}
                         </p>
-                        <p className="text-green-600/60">{ex.good}</p>
+                        <p className="text-green-600/70">{ex.good}</p>
                       </div>
                     ))}
 
                     <div className="flex items-center gap-2 mt-1.5">
-                      <span className="text-[10px] text-black/25 font-sans">
+                      <span className="text-xs text-black/45 font-sans">
                         From {rule.sourceCount} report
                         {rule.sourceCount > 1 ? "s" : ""}
                       </span>
-                      <span className="text-[10px] text-black/20 font-sans">
+                      <span className="text-xs text-black/35 font-sans">
                         {new Date(rule.createdAt).toLocaleDateString()}
                       </span>
                     </div>

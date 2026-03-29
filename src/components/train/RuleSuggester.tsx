@@ -95,10 +95,10 @@ export default function RuleSuggester({
   return (
     <div className="flex flex-col min-h-0 border-r border-celadon/20 overflow-hidden">
       <div className="shrink-0 px-4 py-3 border-b border-black/5">
-        <h2 className="text-[11px] font-sans font-medium text-black/50 uppercase tracking-wider">
+        <h2 className="text-sm font-sans font-semibold text-black/80 uppercase tracking-wider">
           Rule Suggester
         </h2>
-        <p className="text-[10px] font-sans text-black/30 mt-0.5">
+        <p className="text-xs font-sans text-black/50 mt-0.5">
           GPT analyzes selected feedback and proposes a rule
         </p>
       </div>
@@ -106,7 +106,7 @@ export default function RuleSuggester({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {successMsg && (
           <div className="p-3 rounded-xl bg-celadon/20 border border-celadon/40">
-            <p className="text-xs font-sans font-medium text-green-800">
+            <p className="text-sm font-sans font-medium text-green-800">
               {successMsg}
             </p>
           </div>
@@ -114,17 +114,17 @@ export default function RuleSuggester({
 
         {selectedFeedback.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <p className="text-sm font-sans text-black/30">
+            <p className="text-base font-sans text-black/50">
               Select feedback items from the inbox
             </p>
-            <p className="text-xs font-sans text-black/20 mt-1">
+            <p className="text-sm font-sans text-black/40 mt-1">
               Then click &ldquo;Suggest Rule&rdquo; to have GPT create a
               reusable language rule from the patterns.
             </p>
           </div>
         ) : (
           <>
-            <div className="text-xs font-sans text-black/50">
+            <div className="text-sm font-sans text-black/70">
               {selectedFeedback.length} item{selectedFeedback.length > 1 ? "s" : ""}{" "}
               selected{language ? ` (${language})` : ""}
             </div>
@@ -132,14 +132,14 @@ export default function RuleSuggester({
             <button
               onClick={handleSuggest}
               disabled={loading}
-              className="w-full py-2.5 rounded-xl text-xs font-sans font-medium bg-black text-white hover:bg-black/80 transition-colors disabled:opacity-40"
+              className="w-full py-2.5 rounded-xl text-sm font-sans font-medium bg-black text-white hover:bg-black/80 transition-colors disabled:opacity-40"
             >
               {loading ? "Analyzing feedback..." : "Suggest Rule"}
             </button>
 
             {error && (
               <div className="p-3 rounded-xl bg-red-50 border border-red-200">
-                <p className="text-xs text-red-600 font-sans font-medium">
+                <p className="text-sm text-red-600 font-sans font-medium">
                   {error}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function RuleSuggester({
 
             {suggestion && (
               <div ref={resultRef} className="space-y-3 p-3 rounded-xl bg-celadon/10 border border-celadon/30">
-                <div className="text-[11px] font-sans font-medium text-green-800 uppercase tracking-wider">
+                <div className="text-xs font-sans font-semibold text-green-800 uppercase tracking-wider">
                   Suggested Rule
                 </div>
 
@@ -155,18 +155,18 @@ export default function RuleSuggester({
                   value={editedRule}
                   onChange={(e) => setEditedRule(e.target.value)}
                   rows={3}
-                  className="w-full text-sm font-sans px-3 py-2 rounded-lg border border-black/10 bg-white resize-none focus:outline-none focus:ring-1 focus:ring-celadon"
+                  className="w-full text-base font-sans px-3 py-2 rounded-lg border border-black/10 bg-white resize-none focus:outline-none focus:ring-1 focus:ring-celadon"
                 />
 
                 {suggestion.examples?.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-[11px] font-sans text-black/40 uppercase tracking-wider">
+                    <span className="text-xs font-sans font-semibold text-black/60 uppercase tracking-wider">
                       Examples
                     </span>
                     {suggestion.examples.map((ex, i) => (
                       <div
                         key={i}
-                        className="text-xs font-sans p-2 rounded-lg bg-white"
+                        className="text-sm font-sans p-2 rounded-lg bg-white"
                       >
                         <p className="text-red-600/70 line-through">
                           {ex.bad}
@@ -180,7 +180,7 @@ export default function RuleSuggester({
                 <button
                   onClick={handleApprove}
                   disabled={saving || !editedRule.trim()}
-                  className="w-full py-2.5 rounded-xl text-xs font-sans font-medium bg-celadon text-black hover:bg-celadon/80 transition-colors disabled:opacity-40"
+                  className="w-full py-2.5 rounded-xl text-sm font-sans font-medium bg-celadon text-black hover:bg-celadon/80 transition-colors disabled:opacity-40"
                 >
                   {saving ? "Saving..." : "Approve & Create Rule"}
                 </button>

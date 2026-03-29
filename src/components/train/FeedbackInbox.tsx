@@ -24,17 +24,17 @@ export default function FeedbackInbox({
   return (
     <div className="flex flex-col min-h-0 border-r border-celadon/20 overflow-hidden">
       <div className="shrink-0 px-4 py-3 border-b border-black/5">
-        <h2 className="text-[11px] font-sans font-medium text-black/50 uppercase tracking-wider">
+        <h2 className="text-sm font-sans font-semibold text-black/80 uppercase tracking-wider">
           Feedback Inbox ({feedback.length})
         </h2>
-        <p className="text-[10px] font-sans text-black/30 mt-0.5">
+        <p className="text-xs font-sans text-black/50 mt-0.5">
           Select items to generate a rule
         </p>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {feedback.length === 0 && (
-          <p className="text-sm font-sans text-black/30 text-center py-12 px-4">
+          <p className="text-base font-sans text-black/50 text-center py-12 px-4">
             No feedback yet. Users can report issues on AI responses from the
             Translate page.
           </p>
@@ -78,31 +78,31 @@ export default function FeedbackInbox({
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span
-                      className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${
+                      className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
                         CATEGORY_COLORS[item.category] || CATEGORY_COLORS.other
                       }`}
                     >
                       {item.category}
                     </span>
-                    <span className="text-[10px] text-black/30 font-sans">
+                    <span className="text-xs text-black/50 font-sans">
                       {nativeName(item.language)}
                     </span>
-                    <span className="text-[10px] text-black/20 font-sans">
+                    <span className="text-xs text-black/40 font-sans">
                       {new Date(item.timestamp).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <p className="text-xs font-sans text-black/70 line-clamp-2">
+                  <p className="text-sm font-sans text-black/80 line-clamp-2">
                     {item.description}
                   </p>
 
                   {item.suggestedFix && (
-                    <p className="text-[11px] font-sans text-celadon-dark italic line-clamp-1">
+                    <p className="text-xs font-sans text-celadon-dark italic line-clamp-1">
                       Better: &ldquo;{item.suggestedFix}&rdquo;
                     </p>
                   )}
 
-                  <p className="text-[10px] font-sans text-black/30 line-clamp-1 truncate">
+                  <p className="text-xs font-sans text-black/50 line-clamp-1 truncate">
                     Response: &ldquo;{item.originalResponse.slice(0, 100)}&rdquo;
                   </p>
                 </div>
