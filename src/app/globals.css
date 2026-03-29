@@ -230,6 +230,7 @@ body {
 .globe-container {
   width: 480px; height: 480px;
   margin-bottom: 2.5rem;
+  margin-top: 2.5rem;
   cursor: pointer;
   opacity: 0;
   animation: heroFadeIn 0.8s ease-out 1.6s forwards;
