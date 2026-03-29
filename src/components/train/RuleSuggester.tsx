@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Feedback } from "@/lib/types";
 
 interface SuggestedRule {
@@ -22,12 +22,15 @@ export default function RuleSuggester({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const resultRef = useRef<HTMLDivElement>(null);
 
   async function handleSuggest() {
     if (!selectedFeedback.length) return;
     setLoading(true);
     setError("");
     setSuggestion(null);
+    setSuccessMsg("");
 
     try {
       const res = await fetch("/api/rules/suggest", {
@@ -36,14 +39,22 @@ export default function RuleSuggester({
         body: JSON.stringify({ feedbackItems: selectedFeedback }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to get suggestion");
+        throw new Error(data.error || `Server error (${res.status})`);
       }
 
-      const data: SuggestedRule = await res.json();
+      if (!data.rule) {
+        throw new Error("No rule was generated. Try selecting different feedback items.");
+      }
+
       setSuggestion(data);
       setEditedRule(data.rule);
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -54,6 +65,7 @@ export default function RuleSuggester({
   async function handleApprove() {
     if (!editedRule.trim() || !language) return;
     setSaving(true);
+    setError("");
 
     try {
       const res = await fetch("/api/rules", {
@@ -67,9 +79,11 @@ export default function RuleSuggester({
         }),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Failed to save rule");
       setSuggestion(null);
       setEditedRule("");
+      setSuccessMsg("Rule created! It will be used in future responses.");
+      setTimeout(() => setSuccessMsg(""), 4000);
       onApproved();
     } catch {
       setError("Failed to save rule");
@@ -90,6 +104,14 @@ export default function RuleSuggester({
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {successMsg && (
+          <div className="p-3 rounded-xl bg-celadon/20 border border-celadon/40">
+            <p className="text-xs font-sans font-medium text-green-800">
+              {successMsg}
+            </p>
+          </div>
+        )}
+
         {selectedFeedback.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <p className="text-sm font-sans text-black/30">
@@ -116,22 +138,25 @@ export default function RuleSuggester({
             </button>
 
             {error && (
-              <p className="text-xs text-red-500 font-sans">{error}</p>
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200">
+                <p className="text-xs text-red-600 font-sans font-medium">
+                  {error}
+                </p>
+              </div>
             )}
 
             {suggestion && (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-[11px] font-sans text-black/40 uppercase tracking-wider">
-                    Suggested Rule (editable)
-                  </label>
-                  <textarea
-                    value={editedRule}
-                    onChange={(e) => setEditedRule(e.target.value)}
-                    rows={3}
-                    className="w-full mt-1 text-sm font-sans px-3 py-2 rounded-lg border border-black/10 bg-white resize-none focus:outline-none focus:ring-1 focus:ring-celadon"
-                  />
+              <div ref={resultRef} className="space-y-3 p-3 rounded-xl bg-celadon/10 border border-celadon/30">
+                <div className="text-[11px] font-sans font-medium text-green-800 uppercase tracking-wider">
+                  Suggested Rule
                 </div>
+
+                <textarea
+                  value={editedRule}
+                  onChange={(e) => setEditedRule(e.target.value)}
+                  rows={3}
+                  className="w-full text-sm font-sans px-3 py-2 rounded-lg border border-black/10 bg-white resize-none focus:outline-none focus:ring-1 focus:ring-celadon"
+                />
 
                 {suggestion.examples?.length > 0 && (
                   <div className="space-y-2">
@@ -141,7 +166,7 @@ export default function RuleSuggester({
                     {suggestion.examples.map((ex, i) => (
                       <div
                         key={i}
-                        className="text-xs font-sans p-2 rounded-lg bg-black/[0.03]"
+                        className="text-xs font-sans p-2 rounded-lg bg-white"
                       >
                         <p className="text-red-600/70 line-through">
                           {ex.bad}

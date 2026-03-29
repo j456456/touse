@@ -1,16 +1,13 @@
 /**
- * Response evaluation using the M-Prometheus rubric.
- *
- * Uses the exact prompt template and scoring rubric from M-Prometheus
+ * Response evaluation using the M-Prometheus rubric
  * (arXiv 2504.04953), routed through OpenAI for hosted inference.
  *
- * Supported languages sourced from the M-Prometheus paper.
+ * Uses the official Prometheus direct-assessment prompt template.
  */
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "gpt-3.5-turbo";
 
-/** DeepL language code → language name, for languages M-Prometheus was evaluated on. */
 const SUPPORTED_LANGUAGES: Record<string, string> = {
   AR: "Arabic",
   BG: "Bulgarian",
@@ -40,45 +37,55 @@ export function isLanguageSupported(deeplCode: string): boolean {
   return deeplCode in SUPPORTED_LANGUAGES;
 }
 
+/**
+ * Official M-Prometheus / Prometheus-2 direct-assessment prompt.
+ */
 function buildPrompt(instruction: string, response: string): string {
-  return [
-    "Rate the following AI response on a scale of 1-5 based on accuracy, fluency (naturalness of language), and helpfulness.",
-    "",
-    "Score meanings:",
-    "1=Incorrect/incoherent, 2=Partially correct but flawed, 3=Acceptable but lacks depth, 4=Accurate and well-structured, 5=Excellent and comprehensive",
-    "",
-    "Instruction: " + instruction,
-    "",
-    "Response: " + response.slice(0, 2000),
-    "",
-    "Output EXACTLY in this format (score FIRST, then explanation):",
-    "[RESULT] <score 1-5> <explanation>",
-    "",
-    "If the score is below 5, you MUST specifically explain what is wrong — e.g. unnatural phrasing, clunky grammar, missing details, factual errors, or awkward translations. Be concrete and cite examples from the response. 2-3 sentences.",
-    "If the score is 5, a single sentence confirming quality is sufficient.",
-  ].join("\n");
+  return `###Task Description: An instruction (might include an Input inside it), a response to evaluate, a reference answer that gets a score of 5, and a score rubric representing a evaluation criteria are given.
+1. Write a detailed feedback that assess the quality of the response strictly based on the given score rubric, not evaluating in general.
+2. After writing a feedback, write a score that is an integer between 1 and 5. You should refer to the score rubric.
+3. The output format should look as follows: "Feedback: (write a feedback for criteria) [RESULT] (an integer number between 1 and 5)"
+4. Please do not generate any other opening, closing, and explanations.
+
+###The instruction to evaluate:
+${instruction}
+
+###Response to evaluate:
+${response.slice(0, 2000)}
+
+###Reference Answer (Score 5):
+A perfect response would fully and accurately address the instruction in a natural, fluent manner appropriate for the target language and cultural context.
+
+###Score Rubrics: [Accuracy, Fluency, Helpfulness, Brevity, Relevance]
+Score 1: The response contains major errors that significantly alter the meaning. It is barely comprehensible, reads like a poor machine translation, and is either far too verbose or fails to address the instruction. The style is completely inconsistent.
+Score 2: The response has several inaccuracies that affect the overall meaning. It is difficult to read, with frequent awkward phrasings. It includes noticeable filler or off-topic content. The style only occasionally matches expectations.
+Score 3: The response is mostly accurate but has some minor errors. It is generally understandable but lacks natural flow in some parts. It is somewhat concise and mostly on-topic, though it could be tighter. The style is somewhat consistent.
+Score 4: The response is accurate with only a few negligible errors. It reads naturally, is concise without omitting important details, and stays focused on the instruction. The style largely matches expectations.
+Score 5: The response is highly accurate, conveying the full meaning. It reads as fluently as a native text, is perfectly concise — no unnecessary padding — and directly addresses every aspect of the instruction. The style perfectly captures the appropriate tone and register.
+
+###Feedback:`;
 }
 
 function parseResult(text: string): { score: number; feedback: string } | null {
-  // Try strict format first: [RESULT] 4
-  const strict = text.match(/\[RESULT\]\s*(\d)([\s\S]*)/);
-  if (strict) {
-    const score = parseInt(strict[1], 10);
-    if (score >= 1 && score <= 5) return { score, feedback: strict[2]?.trim() || "" };
+  const match = text.match(/\[RESULT\]\s*(\d)/);
+  if (match) {
+    const score = parseInt(match[1], 10);
+    if (score >= 1 && score <= 5) {
+      const feedback = text.replace(/\[RESULT\]\s*\d/, "").trim();
+      return { score, feedback };
+    }
   }
-  // Fallback: [4] or [RESULT]4 or just a leading digit
-  const loose = text.match(/\[(\d)\]|^\s*(\d)\s*[.:\-\/]|Score:\s*(\d)/m);
+  const loose = text.match(/\[(\d)\]|Score:\s*(\d)/m);
   if (loose) {
-    const score = parseInt(loose[1] || loose[2] || loose[3], 10);
+    const score = parseInt(loose[1] || loose[2], 10);
     if (score >= 1 && score <= 5) return { score, feedback: text.trim() };
   }
   return null;
 }
 
 /**
- * Evaluate a single response using the M-Prometheus rubric.
- * Returns a score 1–5 with feedback, or null if the language is
- * unsupported or the API call fails.
+ * Evaluate a response using the M-Prometheus rubric via OpenAI.
+ * Returns a score 1-5 with feedback, or null if unavailable.
  */
 export async function evaluateResponse(
   instruction: string,
@@ -86,10 +93,10 @@ export async function evaluateResponse(
   languageCode: string,
 ): Promise<{ score: number; feedback: string } | null> {
   if (!isLanguageSupported(languageCode)) return null;
+  if (!response.trim()) return null;
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
-  if (!response.trim()) return null;
 
   const prompt = buildPrompt(instruction, response);
 
@@ -119,7 +126,10 @@ export async function evaluateResponse(
 
     const result = parseResult(generated);
     if (!result) {
-      console.warn("[evaluate] Could not parse score from:", generated.slice(0, 300));
+      console.warn(
+        "[evaluate] Could not parse score from:",
+        generated.slice(0, 300),
+      );
       return null;
     }
 
