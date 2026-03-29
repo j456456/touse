@@ -2,10 +2,10 @@
 
 @theme inline {
   --color-parchment: #F1E9D2;
-  --color-celadon: #8F9779;
+  --color-celadon: #9dc183;
   --color-ink: #000000;
-  --font-sans: var(--font-poppins);
-  --font-serif: var(--font-libre-baskerville);
+  --font-sans: var(--font-lora), Georgia, serif;
+  --font-serif: var(--font-lora), Georgia, serif;
 }
 
 @keyframes fadeUp {
@@ -26,5 +26,10 @@ html {
 body {
   background: var(--color-parchment);
   color: var(--color-ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-lora), Georgia, serif;
+  font-weight: 400;
+}
+
+* {
+  font-weight: inherit;
 }
