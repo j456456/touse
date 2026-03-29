@@ -1,0 +1,38 @@
+const NATIVE_NAMES: Record<string, string> = {
+  AR: "العربية",
+  BG: "Български",
+  ZH: "中文",
+  CS: "Čeština",
+  DA: "Dansk",
+  NL: "Nederlands",
+  EN: "English",
+  ET: "Eesti",
+  FI: "Suomi",
+  FR: "Français",
+  DE: "Deutsch",
+  EL: "Ελληνικά",
+  HI: "हिन्दी",
+  HU: "Magyar",
+  ID: "Bahasa Indonesia",
+  IT: "Italiano",
+  JA: "日本語",
+  KO: "한국어",
+  LV: "Latviešu",
+  LT: "Lietuvių",
+  NB: "Norsk",
+  PL: "Polski",
+  PT: "Português",
+  RO: "Română",
+  RU: "Русский",
+  SK: "Slovenčina",
+  SL: "Slovenščina",
+  ES: "Español",
+  SV: "Svenska",
+  TR: "Türkçe",
+  UK: "Українська",
+  VI: "Tiếng Việt",
+};
+
+export function nativeName(code: string): string {
+  return NATIVE_NAMES[code.toUpperCase()] || code;
+}
